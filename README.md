@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is a [Next.js](https://nextjs.org/) demo with server actions.
 
 ## Getting Started
 
@@ -12,23 +12,41 @@ yarn dev
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the demo with server component, and [http://localhost:3000/client](http://localhost:3000/client) with client component.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Or live demo on Vercel [nextjs-server-actions-demo.vercel.app](https://nextjs-server-actions-demo.vercel.app/)
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Server Actions
 
-## Learn More
+```js
+// src/app/actions.ts
 
-To learn more about Next.js, take a look at the following resources:
+"use server";
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+import { z } from "zod";
+import { zact } from "zact/server";
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+import fs from "fs/promises";
 
-## Deploy on Vercel
+export const doSubmitWithValidation = zact(
+    z.object({
+        message: z.string().min(6, "Minimum 6 chacracters is required."),
+    })
+)(async (input) => {
+    console.log("this is running on server and validated");
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+    const secretPath = "public/secret.txt";
+    const res = await fs.writeFile(secretPath, input.message);
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+    return { success: true, data: res };
+});
+
+export const formSubmit = (data: FormData) => {
+    const message = (data.get("message") || "") as string;
+
+    console.log("submitted message:", message);
+
+    return doSubmitWithValidation({ message });
+};
+
+```
