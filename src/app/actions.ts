@@ -4,6 +4,8 @@ import { z } from "zod";
 import { zact } from "zact/server";
 
 import fs from "fs/promises";
+import { tmpdir } from "os";
+import { join } from "path";
 
 export const doSubmitWithValidation = zact(
     z.object({
@@ -12,7 +14,9 @@ export const doSubmitWithValidation = zact(
 )(async (input) => {
     console.log("this is running on server and validated");
 
-    const secretPath = "public/secret.txt";
+    const secretPath = join(tmpdir(), "/secret.txt");
+    console.log("path", secretPath);
+
     const res = await fs.writeFile(secretPath, input.message);
 
     return { success: true, data: res };
