@@ -17,9 +17,13 @@ export const doSubmitWithValidation = zact(
     const secretPath = join(tmpdir(), "/secret.txt");
     console.log("path", secretPath);
 
-    const res = await fs.writeFile(secretPath, input.message);
+    await fs.writeFile(secretPath, input.message);
+    const data = await fs.readFile(secretPath);
 
-    return { success: true, data: res };
+    const message = data.toString();
+    console.log("message", message);
+
+    return { success: true, message };
 });
 
 export const formSubmit = (data: FormData) => {

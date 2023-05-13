@@ -8,7 +8,7 @@ export default function ClientPage() {
 
   async function handleClick() {
     const res = await doSubmitWithValidation({ message })
-    console.log('this is from client', res.success)
+    console.log('this is from client', res)
   }
 
   return (
